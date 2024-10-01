@@ -6,6 +6,7 @@
 #include <string>
 #include <fstream>
 #include <cwctype>
+#include <codecvt>
 
 namespace inp {
 
@@ -32,12 +33,15 @@ namespace inp {
             // Processa os argumentos fornecidos
             for (int i = 1; i < argc; ++i) {
                 // Verifica o critério de ordenação (alfabética ou por número de ocorrências)
-                if (strcmp(argv[i], "-ac") == 0 || strcmp(argv[i], "-ad") == 0 || strcmp(argv[i], "-nc") == 0 || strcmp(argv[i], "-nd") == 0) {
+                if (strcmp(argv[i], "-ac") == 0 || strcmp(argv[i], "-ad") == 0 || 
+                    strcmp(argv[i], "-nc") == 0 || strcmp(argv[i], "-nd") == 0) {
                     modo_de_ordenacao = argv[i];
                 }
                 // Verifica o formato de saída (CSV ou HTML)
                 else if (strcmp(argv[i], "-html") == 0) {
                     formato_de_saida = "-html";
+                } else if (strcmp(argv[i], "-csv") == 0) {
+                    formato_de_saida = "-csv";
                 }
                 // Caso não seja nem critério de ordenação nem formato de saída, assume que é o nome do arquivo
                 else {
@@ -86,6 +90,89 @@ namespace inp {
 
         // Conta o número de palavras distintas (o tamanho do mapa)
         palavras_distintas = ocorrencias.size();
-        wif.close();  // Fecha o arquivo após o processamento
+        
+        // Saindo do arquivo após o processamento
+        wif.close();  
+
+        // Exportando os resultados
+        std::string nome_saida = "saida";
+        if (formato_de_saida == "-csv") {
+            exportar_csv(nome_saida + ".csv");
+        } else if (formato_de_saida == "-html") {
+            exportar_html(nome_saida + ".html");
+        }
     }
+
+    void p_input::exportar_csv(const std::string& arquivo_saida) const {
+        std::ofstream ofs(arquivo_saida);
+        if (!ofs.is_open()) {
+            std::cout << "Erro ao criar o arquivo CSV." << std::endl;
+            return;
+        }
+
+        ofs << "Palavra,Ocorrências\n"; // Cabeçalho do CSV
+        for (const auto& [palavra, contagem] : ocorrencias) {
+            ofs << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(palavra) << "," << contagem << "\n";
+        }
+
+        ofs.close();
+        std::cout << "Exportação para CSV concluída: " << arquivo_saida << std::endl;
+    }
+
+    void p_input::exportar_html(const std::string& arquivo_saida) const {
+        std::ofstream ofs(arquivo_saida);
+        if (!ofs.is_open()) {
+            std::cout << "Erro ao criar o arquivo HTML." << std::endl;
+            return;
+        }
+
+        // Escrevendo o cabeçalho HTML
+        ofs << "<html>\n<head>\n<title>Resultados da Contagem de Palavras</title>\n</head>\n<body>\n";
+        ofs << "<h1>Resultados da Contagem de Palavras</h1>\n";
+        ofs << "<table border='1'>\n<tr><th>Palavra</th><th>Ocorrências</th></tr>\n";
+
+        // Adicionando dados ao corpo do HTML
+        for (const auto& [palavra, contagem] : ocorrencias) {
+            ofs << "<tr>\n";
+            ofs << "<td>" << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(palavra) << "</td>\n";
+            ofs << "<td>" << contagem << "</td>\n";
+            ofs << "</tr>\n";
+        }
+
+        // Fechando as tags HTML
+        ofs << "</table>\n</body>\n</html>\n";
+
+        ofs.close();  // Fecha o arquivo após a escrita
+        std::cout << "Exportação para HTML concluída: " << arquivo_saida << std::endl;
+    }
+
+    // Getters
+    std::string p_input::get_modo_de_ordenacao() const {
+        return modo_de_ordenacao;
+    }
+
+    std::string p_input::get_nome_do_arquivo() const {
+        return nome_do_arquivo;
+    }
+
+    std::string p_input::get_formato_de_saida() const {
+        return formato_de_saida;
+    }
+
+    int p_input::get_qtd_caracteres() const {
+        return caracteres;
+    }
+
+    int p_input::get_total_de_palavras() const {
+        return total_de_palavras;
+    }
+
+    int p_input::get_palavras_distintas() const {
+        return palavras_distintas;
+    }
+
+    std::map<std::wstring, int> p_input::get_map() const {
+        return ocorrencias;
+    }
+
 }
