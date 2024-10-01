@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
         std::wcout << L"Palavra: " << palavra << L" | Ocorrências: " << contagem << std::endl;
     }
 
-    std::wcout << L"Número de caracteres lidos: " << entrada.get_qtd_caracteres() << std::endl
+    std::wcout << L"Número de caracteres lidos: " << entrada.get_qtd_de_caracteres() << std::endl
                << L"Número de palavras distintas: " << entrada.get_palavras_distintas() << std::endl
                << L"Número total de palavras: " << entrada.get_total_de_palavras() << std::endl;
 
