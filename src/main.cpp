@@ -10,9 +10,8 @@ int main(int argc, char* argv[]) {
 
     std::map<std::wstring, int> map_ref = entrada.get_map();
 
-    for (const auto& [palavra, contagem] : map_ref) {
-        std::wcout << L"Palavra: " << palavra << L" | Ocorrências: " << contagem << std::endl;
-    }
+    // Ordenação e exibição dos resultados
+    entrada.ordenar_e_exibir(map_ref);
 
     std::wcout << L"Número de caracteres lidos: " << entrada.get_qtd_de_caracteres() << std::endl
                << L"Número de palavras distintas: " << entrada.get_palavras_distintas() << std::endl
