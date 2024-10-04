@@ -106,41 +106,86 @@ namespace inp {
     }
 
     void p_input::exportar_csv(const std::string& arquivo_saida) const {
-        std::ofstream ofs(arquivo_saida);
-        if (!ofs.is_open()) {
-            std::cout << "Erro ao criar o arquivo CSV." << std::endl;
-            return;
-        }
-
-        ofs << "Palavra,Ocorrências\n";
-        for (const auto& [palavra, contagem] : ocorrencias) {
-            ofs << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(palavra) << "," << contagem << "\n";
-        }
-
-        ofs.close();
-        std::cout << "Exportação para CSV concluída: " << arquivo_saida << std::endl;
+    std::ofstream ofs(arquivo_saida);
+    if (!ofs.is_open()) {
+        std::cout << "Erro ao criar o arquivo CSV." << std::endl;
+        return;
     }
 
-    void p_input::exportar_html(const std::string& arquivo_saida) const {
-        std::ofstream ofs(arquivo_saida);
-        if (!ofs.is_open()) {
-            std::cout << "Erro ao criar o arquivo HTML." << std::endl;
-            return;
-        }
+    ofs << "Palavra,Ocorrências\n";
 
-        ofs << "<html>\n<head>\n<title>Resultados da Contagem de Palavras</title>\n</head>\n<body>\n";
-        ofs << "<h1>Resultados da Contagem de Palavras</h1>\n";
-        ofs << "<table border='1'>\n<tr><th>Palavra</th><th>Ocorrências</th></tr>\n";
-
-        for (const auto& [palavra, contagem] : ocorrencias) {
-            ofs << "<tr>\n<td>" << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(palavra) << "</td>\n";
-            ofs << "<td>" << contagem << "</td>\n</tr>\n";
-        }
-
-        ofs << "</table>\n</body>\n</html>\n";
-        ofs.close();
-        std::cout << "Exportação para HTML concluída: " << arquivo_saida << std::endl;
+    // Criar um vetor de pares e ordenar conforme o modo de ordenação
+    std::vector<std::pair<std::wstring, int>> vec(ocorrencias.begin(), ocorrencias.end());
+    
+    // Aplicar a ordenação conforme o modo de ordenação selecionado
+    if (modo_de_ordenacao == "-ac") {
+        std::sort(vec.begin(), vec.end(), [](const auto& a, const auto& b) {
+            return a.first < b.first;
+        });
+    } else if (modo_de_ordenacao == "-ad") {
+        std::sort(vec.begin(), vec.end(), [](const auto& a, const auto& b) {
+            return a.first > b.first;
+        });
+    } else if (modo_de_ordenacao == "-nc") {
+        std::sort(vec.begin(), vec.end(), [](const auto& a, const auto& b) {
+            return a.second < b.second;
+        });
+    } else if (modo_de_ordenacao == "-nd") {
+        std::sort(vec.begin(), vec.end(), [](const auto& a, const auto& b) {
+            return a.second > b.second;
+        });
     }
+
+    for (const auto& [palavra, contagem] : vec) {
+        ofs << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(palavra) << "," << contagem << "\n";
+    }
+
+    ofs.close();
+    std::cout << "Exportação para CSV concluída: " << arquivo_saida << std::endl;
+}
+
+void p_input::exportar_html(const std::string& arquivo_saida) const {
+    std::ofstream ofs(arquivo_saida);
+    if (!ofs.is_open()) {
+        std::cout << "Erro ao criar o arquivo HTML." << std::endl;
+        return;
+    }
+
+    ofs << "<html>\n<head>\n<title>Resultados da Contagem de Palavras</title>\n</head>\n<body>\n";
+    ofs << "<h1>Resultados da Contagem de Palavras</h1>\n";
+    ofs << "<table border='1'>\n<tr><th>Palavra</th><th>Ocorrências</th></tr>\n";
+
+    // Criar um vetor de pares e ordenar conforme o modo de ordenação
+    std::vector<std::pair<std::wstring, int>> vec(ocorrencias.begin(), ocorrencias.end());
+    
+    // Aplicar a ordenação conforme o modo de ordenação selecionado
+    if (modo_de_ordenacao == "-ac") {
+        std::sort(vec.begin(), vec.end(), [](const auto& a, const auto& b) {
+            return a.first < b.first;
+        });
+    } else if (modo_de_ordenacao == "-ad") {
+        std::sort(vec.begin(), vec.end(), [](const auto& a, const auto& b) {
+            return a.first > b.first;
+        });
+    } else if (modo_de_ordenacao == "-nc") {
+        std::sort(vec.begin(), vec.end(), [](const auto& a, const auto& b) {
+            return a.second < b.second;
+        });
+    } else if (modo_de_ordenacao == "-nd") {
+        std::sort(vec.begin(), vec.end(), [](const auto& a, const auto& b) {
+            return a.second > b.second;
+        });
+    }
+
+    for (const auto& [palavra, contagem] : vec) {
+        ofs << "<tr>\n<td>" << std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(palavra) << "</td>\n";
+        ofs << "<td>" << contagem << "</td>\n</tr>\n";
+    }
+
+    ofs << "</table>\n</body>\n</html>\n";
+    ofs.close();
+    std::cout << "Exportação para HTML concluída: " << arquivo_saida << std::endl;
+}
 
     // Getters
     std::string p_input::get_modo_de_ordenacao() const {
